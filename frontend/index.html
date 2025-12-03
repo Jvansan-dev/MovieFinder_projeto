@@ -11,17 +11,7 @@
 <body>
     <header class="app-header">
         <h1>Wherefilm</h1>
-        <div class="actions">
-            <button id="openKeyModal">Configurar chave TMDB</button>
-        </div>
     </header>
-
-    <section class="key-warning" id="keyWarning" hidden>
-        <div>
-            <span>É necessário configurar a chave da API do TMDB para buscar filmes.</span>
-            <button id="openKeyModalInline">Configurar agora</button>
-        </div>
-    </section>
 
     <main class="container">
         <section class="search-panel">
@@ -67,22 +57,6 @@
 
         <section class="results" id="results"></section>
     </main>
-
-    <div class="modal" id="keyModal" hidden>
-        <div class="modal-content">
-            <h2>Configurar chave da API TMDB</h2>
-            <form id="keyForm">
-                <div class="field">
-                    <label for="apiKey">Chave da API</label>
-                    <input id="apiKey" type="password" placeholder="Insira sua chave TMDB">
-                </div>
-                <div class="modal-actions">
-                    <button type="submit">Salvar</button>
-                    <button type="button" id="closeKeyModal">Cancelar</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <div class="modal" id="detailsModal" hidden>
         <div class="modal-content details">
