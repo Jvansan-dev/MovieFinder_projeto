@@ -1,0 +1,11 @@
+# Arquivos e pastas ignorados no repositório
+
+# Chaves de API e Variáveis de Ambiente
+.env
+
+# Dependências do Node (pasta grande e desnecessária no Git)
+backend/node_modules/
+
+# Logs e arquivos de build
+*.log
+/dist
