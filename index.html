@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wherefilm</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="app-header">
+        <h1>Wherefilm</h1>
+        <div class="actions">
+            <button id="openKeyModal">Configurar chave TMDB</button>
+        </div>
+    </header>
+
+    <section class="key-warning" id="keyWarning" hidden>
+        <div>
+            <span>É necessário configurar a chave da API do TMDB para buscar filmes.</span>
+            <button id="openKeyModalInline">Configurar agora</button>
+        </div>
+    </section>
+
+    <main class="container">
+        <section class="search-panel">
+            <form id="searchForm">
+                <div class="field">
+                    <label for="query">Pesquisar</label>
+                    <input id="query" name="query" type="search" placeholder="Digite o título do filme"
+                        autocomplete="off">
+                </div>
+                <div class="filters">
+                    <div class="field">
+                        <label for="genre">Gênero</label>
+                        <select id="genre">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="yearMin">Ano mínimo</label>
+                        <input id="yearMin" type="number" min="1900" max="2100" placeholder="1900">
+                    </div>
+                    <div class="field">
+                        <label for="yearMax">Ano máximo</label>
+                        <input id="yearMax" type="number" min="1900" max="2100" placeholder="2025">
+                    </div>
+                    <div class="field">
+                        <label for="ratingMin">Nota mínima</label>
+                        <input id="ratingMin" type="number" min="0" max="10" step="0.1" placeholder="0">
+                    </div>
+                    <div class="field">
+                        <label for="sortBy">Ordenar por</label>
+                        <select id="sortBy">
+                            <option value="popularity.desc">Popularidade</option>
+                            <option value="vote_average.desc">Avaliação</option>
+                            <option value="release_date.desc">Data de lançamento</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <button type="submit" id="searchBtn">Buscar</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="results" id="results"></section>
+    </main>
+
+    <div class="modal" id="keyModal" hidden>
+        <div class="modal-content">
+            <h2>Configurar chave da API TMDB</h2>
+            <form id="keyForm">
+                <div class="field">
+                    <label for="apiKey">Chave da API</label>
+                    <input id="apiKey" type="password" placeholder="Insira sua chave TMDB">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit">Salvar</button>
+                    <button type="button" id="closeKeyModal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="detailsModal" hidden>
+        <div class="modal-content details">
+            <button class="close" id="closeDetails">Fechar</button>
+            <div id="detailsContent"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
