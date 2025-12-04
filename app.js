@@ -1,4 +1,4 @@
-// app.js (MODIFICADO)
+// app.js (MODIFICADO E OTIMIZADO)
 'use strict';
 // 1. Aponta para o seu servidor proxy
 const api = { base: 'http://localhost:3000/api/tmdb-proxy', img: 'https://image.tmdb.org/t/p/w500' };
@@ -16,34 +16,86 @@ const els = {
   detailsContent: document.getElementById('detailsContent'),
   closeDetails: document.getElementById('closeDetails')
 };
-// 2. O estado não guarda mais a chave
-let state = { genres: [], lastQuery: '', results: [] };
-// Funções show/hide/ensureKey e lógica de formulário de chave removidas.
 
-// 3. Função url não injeta mais a chave.
+// 2. O estado e a nova variável de controle de busca
+let state = { genres: [], lastQuery: '', results: [] };
+let currentSearchController = null; // Variável para controlar o cancelamento de requisições
+
+// 3. Função url
 function url(path, params) { const q = new URLSearchParams(params); return `${api.base}${path}?${q.toString()}` }
 
 async function loadGenres() {
-  // Removida a checagem 'if(!state.apiKey)return;'
   const r = await fetch(url('/genre/movie/list', { language: 'pt-BR' }));
   if (!r.ok) return;
   const j = await r.json();
   state.genres = j.genres || [];
   renderGenres()
 }
+
 function renderGenres() { const s = els.genre; const v = s.value; s.innerHTML = '<option value="">Todos</option>' + state.genres.map(g => `<option value="${g.id}">${g.name}</option>`).join(''); s.value = v }
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms) } }
+
+// Event Listeners
 els.query.addEventListener('input', debounce(() => search(), 400));
 els.searchForm.addEventListener('submit', e => { e.preventDefault(); search() });
 ['genre', 'yearMin', 'yearMax', 'ratingMin', 'sortBy'].forEach(id => els[id].addEventListener('change', () => applyFiltersAndRender()));
+
+// OTIMIZAÇÃO DE PERFORMANCE 1: Cancelamento de requisições antigas
 async function search() {
-  // Removida a checagem 'if(!state.apiKey)return;'
-  const q = els.query.value.trim(); state.lastQuery = q;
-  if (!q) { state.results = []; renderResults([]); return }
-  const r = await fetch(url('/search/movie', { query: q, language: 'pt-BR', include_adult: false, page: 1 }));
-  if (!r.ok) { state.results = []; renderResults([]); return }
-  const j = await r.json(); state.results = j.results || []; applyFiltersAndRender()
+  // 1. CANCELA A REQUISIÇÃO ANTERIOR
+  if (currentSearchController) {
+    currentSearchController.abort();
+  }
+
+  const q = els.query.value.trim();
+  state.lastQuery = q;
+
+  if (!q) {
+    state.results = [];
+    renderResults([]);
+    return;
+  }
+
+  // 2. CRIA NOVO CONTROLADOR DE REQUISIÇÃO
+  currentSearchController = new AbortController();
+  const signal = currentSearchController.signal;
+
+  try {
+    const r = await fetch(url('/search/movie', { query: q, language: 'pt-BR', include_adult: false, page: 1 }), { signal });
+
+    // Se a requisição foi cancelada intencionalmente (pelo AbortController), apenas retorna
+    if (signal.aborted) {
+      return;
+    }
+
+    if (!r.ok) {
+      state.results = [];
+      renderResults([]);
+      return;
+    }
+
+    const j = await r.json();
+    state.results = j.results || [];
+    applyFiltersAndRender();
+
+  } catch (error) {
+    // Ignora erros de abortamento (intencional)
+    if (error.name === 'AbortError') {
+      // console.log(`Busca cancelada: ${q}`);
+      return;
+    }
+
+    console.error('Erro na busca:', error);
+    state.results = [];
+    renderResults([]);
+  } finally {
+    // Limpa o controlador, mas apenas se a requisição atual não tiver sido substituída
+    if (currentSearchController && currentSearchController.signal === signal) {
+      currentSearchController = null;
+    }
+  }
 }
+
 function applyFiltersAndRender() {
   const g = els.genre.value ? Number(els.genre.value) : null; const ymin = els.yearMin.value ? Number(els.yearMin.value) : null; const ymax = els.yearMax.value ? Number(els.yearMax.value) : null; const rmin = els.ratingMin.value ? Number(els.ratingMin.value) : 0; const sort = els.sortBy.value; let list = state.results.slice(); if (g) list = list.filter(m => Array.isArray(m.genre_ids) && m.genre_ids.includes(g)); if (ymin) list = list.filter(m => m.release_date && Number(m.release_date.slice(0, 4)) >= ymin); if (ymax) list = list.filter(m => m.release_date && Number(m.release_date.slice(0, 4)) <= ymax); if (rmin) list = list.filter(m => Number(m.vote_average) >= rmin); list = list.sort((a, b) => {
     if (sort === 'vote_average.desc') return Number(b.vote_average) - Number(a.vote_average);
@@ -52,6 +104,7 @@ function applyFiltersAndRender() {
   });
   renderResults(list)
 }
+
 function renderResults(list) { els.results.innerHTML = list.map(m => cardHtml(m)).join(''); attachCardHandlers(list) }
 function cardHtml(m) {
   const img = m.poster_path ? `${api.img}${m.poster_path}` : ''; const year = m.release_date ? m.release_date.slice(0, 4) : ''; const score = (m.vote_average || 0).toFixed(1); return `
@@ -67,9 +120,32 @@ function cardHtml(m) {
     </div>
   </article>
 `}
+
 function genresLabel(ids) { if (!ids || !ids.length) return ''; const names = ids.map(id => { const g = state.genres.find(x => x.id === id); return g ? g.name : null }).filter(Boolean); return names.join(', ') }
 function attachCardHandlers(list) { els.results.querySelectorAll('.view-btn').forEach(b => b.addEventListener('click', () => openDetails(Number(b.dataset.view)))) }
-async function openDetails(id) { const d = await fetch(url(`/movie/${id}`, { language: 'pt-BR' })); if (!d.ok) return; const movie = await d.json(); const c = await fetch(url(`/movie/${id}/credits`, { language: 'pt-BR' })); let credits = { cast: [] }; if (c.ok) credits = await c.json(); renderDetails(movie, credits.cast || []); show(els.detailsModal) }
+
+// OTIMIZAÇÃO DE PERFORMANCE 2: Promise.all para buscas paralelas
+async function openDetails(id) {
+  // Carrega Detalhes e Créditos em paralelo
+  const [detailsResponse, creditsResponse] = await Promise.all([
+    fetch(url(`/movie/${id}`, { language: 'pt-BR' })),
+    fetch(url(`/movie/${id}/credits`, { language: 'pt-BR' }))
+  ]);
+
+  // Trata a resposta de Detalhes
+  if (!detailsResponse.ok) return;
+  const movie = await detailsResponse.json();
+
+  // Trata a resposta de Créditos (pode falhar, mas não impede a exibição)
+  let credits = { cast: [] };
+  if (creditsResponse.ok) {
+    credits = await creditsResponse.json();
+  }
+
+  renderDetails(movie, credits.cast || []);
+  show(els.detailsModal);
+}
+
 function renderDetails(m, cast) {
   const img = m.poster_path ? `${api.img}${m.poster_path}` : ''; const year = m.release_date ? m.release_date.slice(0, 4) : ''; const score = (m.vote_average || 0).toFixed(1); const genres = (m.genres || []).map(g => g.name).join(', '); const topCast = cast.slice(0, 12); els.detailsContent.innerHTML = `
   <div class="details-grid">
@@ -84,6 +160,7 @@ function renderDetails(m, cast) {
     </div>
   </div>
 `}
+
 function castCard(c) {
   const img = c.profile_path ? `${api.img}${c.profile_path}` : ''; return `
   <div class="cast-card">
@@ -94,9 +171,11 @@ function castCard(c) {
     </div>
   </div>
 `}
+
 els.closeDetails.addEventListener('click', () => hide(els.detailsModal));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(els.detailsModal) });
 function escapeHtml(s) { return String(s).replace(/[&<>"]+/g, a => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[a])) }
+
 loadGenres();
 
 // Funções utilitárias que foram removidas do código original
