@@ -1,11 +1,8 @@
-# Arquivos e pastas ignorados no repositório
+# .gitignore
 
-# Chaves de API e Variáveis de Ambiente
-.env
+# Arquivo que contém chaves secretas (API Key)
+config.js
 
-# Dependências do Node (pasta grande e desnecessária no Git)
-backend/node_modules/
-
-# Logs e arquivos de build
-*.log
-/dist
+# Opcional: Arquivos de log do sistema operacional
+.DS_Store
+Thumbs.db

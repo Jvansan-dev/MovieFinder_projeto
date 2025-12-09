@@ -1,71 +1,46 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wherefilm</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>🎬 MovieFinder | Busca de Filmes TMDB</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
-    <header class="app-header">
-        <h1>Wherefilm</h1>
+
+    <header class="header-fixed">
+        <div class="container header-content">
+            <h1 class="logo">MovieFinder</h1>
+            <div class="search-area">
+                <input type="text" id="searchInput" placeholder="Buscar filmes por título...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <button id="themeToggle" class="theme-toggle" aria-label="Alternar modo claro e escuro">
+                <i class="fas fa-sun"></i>
+            </button>
+        </div>
     </header>
 
-    <main class="container">
-        <section class="search-panel">
-            <form id="searchForm">
-                <div class="field">
-                    <label for="query">Pesquisar</label>
-                    <input id="query" name="query" type="search" placeholder="Digite o título do filme"
-                        autocomplete="off">
-                </div>
-                <div class="filters">
-                    <div class="field">
-                        <label for="genre">Gênero</label>
-                        <select id="genre">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="yearMin">Ano mínimo</label>
-                        <input id="yearMin" type="number" min="1900" max="2100" placeholder="1900">
-                    </div>
-                    <div class="field">
-                        <label for="yearMax">Ano máximo</label>
-                        <input id="yearMax" type="number" min="1900" max="2100" placeholder="2025">
-                    </div>
-                    <div class="field">
-                        <label for="ratingMin">Nota mínima</label>
-                        <input id="ratingMin" type="number" min="0" max="10" step="0.1" placeholder="0">
-                    </div>
-                    <div class="field">
-                        <label for="sortBy">Ordenar por</label>
-                        <select id="sortBy">
-                            <option value="popularity.desc">Popularidade</option>
-                            <option value="vote_average.desc">Avaliação</option>
-                            <option value="release_date.desc">Data de lançamento</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="field">
-                    <button type="submit" id="searchBtn">Buscar</button>
-                </div>
-            </form>
-        </section>
-
-        <section class="results" id="results"></section>
+    <main class="container movie-list-container">
+        <h2 id="listTitle">Filmes Populares Atuais</h2>
+        <div class="movie-grid" id="movieGrid">
+        </div>
+        <p class="message-text" id="statusMessage" style="display: none;"></p>
     </main>
 
-    <div class="modal" id="detailsModal" hidden>
-        <div class="modal-content details">
-            <button class="close" id="closeDetails">Fechar</button>
-            <div id="detailsContent"></div>
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            <div id="modalBody">
+            </div>
         </div>
     </div>
+    <script src="config.js"></script>
 
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
