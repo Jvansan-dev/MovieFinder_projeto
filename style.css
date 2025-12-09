@@ -181,6 +181,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
@@ -230,6 +231,7 @@ body {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 8;
+    line-clamp: 8;
     -webkit-box-orient: vertical;
 }
 
