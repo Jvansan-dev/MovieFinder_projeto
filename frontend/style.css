@@ -34,8 +34,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     transition: background-color 0.3s, color 0.3s;
-    padding-top: 80px;
-    /* Espaço para o header fixo */
+    padding-top: 80px; /* Espaço para o header fixo */
 }
 
 .container {
@@ -121,8 +120,7 @@ body {
 /* --- 3. LISTAGEM E GRID DE FILMES (RESPONSIVO) --- */
 .movie-list-container {
     padding-top: 30px;
-    min-height: calc(100vh - 80px);
-    /* Garante que o main ocupe a altura mínima */
+    min-height: calc(100vh - 80px); /* Garante que o main ocupe a altura mínima */
 }
 
 #listTitle {
@@ -163,8 +161,7 @@ body {
     width: 100%;
     height: auto;
     display: block;
-    aspect-ratio: 2 / 3;
-    /* Proporção de pôster de filme */
+    aspect-ratio: 2 / 3; /* Proporção de pôster de filme */
     object-fit: cover;
 }
 
@@ -176,13 +173,12 @@ body {
     font-size: 1.1rem;
     font-weight: bold;
     margin-bottom: 5px;
-    height: 2.8em;
-    /* 2 linhas */
+    height: 2.8em; /* 2 linhas */
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    line-clamp: 2;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
 }
 
@@ -243,8 +239,7 @@ body {
 }
 
 .skeleton-card {
-    height: 380px;
-    /* Altura aproximada do card de filme */
+    height: 380px; /* Altura aproximada do card de filme */
     position: relative;
 }
 
@@ -269,11 +264,9 @@ body {
     0% {
         opacity: 0.6;
     }
-
     50% {
         opacity: 1;
     }
-
     100% {
         opacity: 0.6;
     }
@@ -281,8 +274,7 @@ body {
 
 /* --- 6. MODAL DE DETALHES --- */
 .modal {
-    display: none;
-    /* Escondido por padrão */
+    display: none; /* Escondido por padrão */
     position: fixed;
     z-index: 2000;
     left: 0;
@@ -297,8 +289,7 @@ body {
 
 .modal-content {
     background-color: var(--card-background);
-    margin: 5% auto;
-    /* 5% do topo e centrado */
+    margin: 5% auto; /* 5% do topo e centrado */
     padding: 20px;
     border-radius: 15px;
     width: 90%;
@@ -368,8 +359,7 @@ body {
     font-size: 1.1rem;
 }
 
-.cast-list,
-.recommendations-grid {
+.cast-list, .recommendations-grid {
     display: flex;
     overflow-x: auto;
     gap: 15px;
@@ -379,8 +369,7 @@ body {
 
 .cast-member {
     text-align: center;
-    flex: 0 0 100px;
-    /* Largura fixa para os cards de ator */
+    flex: 0 0 100px; /* Largura fixa para os cards de ator */
 }
 
 .cast-photo {
@@ -395,8 +384,7 @@ body {
 .recommendation-card {
     text-align: center;
     cursor: pointer;
-    flex: 0 0 150px;
-    /* Largura fixa para recomendações */
+    flex: 0 0 150px; /* Largura fixa para recomendações */
 }
 
 .recommendation-poster {
@@ -411,8 +399,7 @@ body {
 .recommendation-card p {
     white-space: normal;
     font-size: 0.9rem;
-    height: 2.5em;
-    /* Garante altura para 2 linhas de título */
+    height: 2.5em; /* Garante altura para 2 linhas de título */
     overflow: hidden;
 }
 
@@ -428,8 +415,7 @@ body {
 /* --- 8. MEDIA QUERIES (Responsividade) --- */
 @media (min-width: 768px) {
     .modal-details-grid {
-        grid-template-columns: 2fr 1fr;
-        /* Sinopse + Detalhes */
+        grid-template-columns: 2fr 1fr; /* Sinopse + Detalhes */
     }
 }
 
@@ -438,19 +424,15 @@ body {
         flex-direction: column;
         padding: 10px 20px;
     }
-
     .logo {
         margin-bottom: 10px;
     }
-
     .search-area {
         width: 100%;
         margin: 0 0 10px 0;
     }
-
     body {
-        padding-top: 120px;
-        /* Ajusta o padding para o header empilhado */
+        padding-top: 120px; /* Ajusta o padding para o header empilhado */
     }
 }
 
@@ -459,7 +441,6 @@ body {
         /* Em telas muito pequenas, use 2 colunas */
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
-
     .modal-movie-title {
         font-size: 1.8rem;
     }

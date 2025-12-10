@@ -1,8 +1,13 @@
 # .gitignore
 
-# Arquivo que contém chaves secretas (API Key)
-config.js
+# 1. Ignora o arquivo secreto do backend
+/backend/.env
 
-# Opcional: Arquivos de log do sistema operacional
+# 2. Ignora a pasta de dependências do Node.js
+/backend/node_modules
+
+# 3. Ignora a pasta de dependências do frontend (se usar)
+/frontend/node_modules
+
+# Ignora arquivos de sistema
 .DS_Store
-Thumbs.db
