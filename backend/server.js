@@ -3,7 +3,7 @@ require('dotenv').config(); // Carrega as variáveis de ambiente
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
-const path = require('path');
+const path = require('path'); // ⬅️ NOVIDADE: Módulo para trabalhar com caminhos
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,13 +17,22 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// 1. Servir arquivos estáticos (CSS, JS, Imagens, etc.) da pasta 'frontend'
+// **********************************************
+// **** INÍCIO DO CÓDIGO PARA SERVIR O FRONTEND ****
+// **********************************************
+
+// 1. Servir arquivos estáticos (CSS, JS, Imagens) da pasta 'frontend'
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // 2. Definir a rota principal (/) para enviar o index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
+
+// **********************************************
+// **** FIM DO CÓDIGO PARA SERVIR O FRONTEND ****
+// **********************************************
+
 
 /**
  * Rota para buscar filmes populares ou por termo de busca.
@@ -33,8 +42,7 @@ app.get('/', (req, res) => {
  */
 app.get('/api/movies', async (req, res) => {
     const { query, endpoint, movie_id } = req.query;
-
-    // Determina qual endpoint do TMDB usar
+    // ... (o restante da rota permanece inalterado)
     let tmdbEndpoint = '/movie/popular'; // Padrão
     let params = { api_key: TMDB_API_KEY, language: 'pt-BR' };
 
