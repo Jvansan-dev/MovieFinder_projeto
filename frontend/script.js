@@ -145,26 +145,32 @@ function createRecommendationsHTML(recommendations) {
  * @param {Object} params - Parâmetros de query adicionais.
  * @returns {Promise<Object>} - O objeto de resposta JSON da API.
  */
-// /frontend/script.js (Função de requisição atualizada)
+// /frontend/script.js (FUNÇÃO CORRIGIDA)
 async function fetchProxy(endpoint, params = {}) {
-    // Seu frontend envia os parâmetros para o seu backend
     const query = new URLSearchParams({
-        // Note que NÃO passamos a API_KEY aqui!
-        endpoint: endpoint, // Passamos o endpoint que queremos do TMDB
+        endpoint: endpoint,
         ...params
     }).toString();
 
-    // A URL agora aponta para o seu servidor proxy
     const url = `${PROXY_URL}/api/movies?${query}`;
+    
+    // --- CÓDIGO DE CORREÇÃO INCLUÍDO AQUI ---
+    // 1. Define o controlador de aborto
+    const controller = new AbortController();
+    
+    // 2. Define o timeout (10 segundos)
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, 10000); // Cancela a requisição após 10 segundos
+    // ----------------------------------------
 
     try {
-        // ... (o código de timeout e fetch permanece o mesmo) ...
         const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeoutId);
+        
+        // 3. Limpa o timeout (para que ele não seja acionado se a requisição for rápida)
+        clearTimeout(timeoutId); 
 
-        // ... (o tratamento de erro permanece o mesmo) ...
         if (!response.ok) {
-            // Seu backend retornará um JSON de erro
             const errorBody = await response.json();
             throw new Error(`Erro: ${response.status} - ${errorBody.error || 'Falha na requisição.'}`);
         }
@@ -172,45 +178,14 @@ async function fetchProxy(endpoint, params = {}) {
         return await response.json();
 
     } catch (error) {
+        // Assegura que o timeout seja limpo mesmo em caso de erro de rede antes do timeout
+        clearTimeout(timeoutId); 
+
         if (error.name === 'AbortError') {
             throw new Error('A requisição excedeu o tempo limite.');
         }
         console.error('Erro no fetchProxy:', error);
         throw error;
-    }
-}
-
-/**
- * Carrega a lista de filmes (popular ou de busca).
- * @param {string} query - O termo de busca. Se vazio, carrega populares.
- */
-async function loadMovies(query = '') {
-    renderSkeletons();
-
-    let endpoint;
-    let params = {};
-
-    if (query.trim()) {
-        endpoint = '/search/movie';
-        params.query = query;
-        listTitle.textContent = `Resultados da busca por: "${query}"`;
-    } else {
-        endpoint = '/movie/popular';
-        listTitle.textContent = 'Filmes Populares Atuais';
-    }
-
-    try {
-        const data = await fetchProxy(endpoint, params);
-
-        if (data.results && data.results.length > 0) {
-            movieGrid.innerHTML = data.results.map(createMovieCardHTML).join('');
-            hideStatus();
-        } else {
-            showStatus('Nenhum filme encontrado com este termo.');
-        }
-
-    } catch (error) {
-        showStatus(`Falha ao carregar os filmes. ${error.message}`);
     }
 }
 
