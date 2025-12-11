@@ -145,32 +145,32 @@ function createRecommendationsHTML(recommendations) {
  * @param {Object} params - Parâmetros de query adicionais.
  * @returns {Promise<Object>} - O objeto de resposta JSON da API.
  */
-// /frontend/script.js (FUNÇÃO CORRIGIDA)
 async function fetchProxy(endpoint, params = {}) {
+    // Seu frontend envia os parâmetros para o seu backend
     const query = new URLSearchParams({
-        endpoint: endpoint,
+        // Note que NÃO passamos a API_KEY aqui!
+        endpoint: endpoint, // Passamos o endpoint que queremos do TMDB
         ...params
     }).toString();
 
+    // A URL agora aponta para o seu servidor proxy
     const url = `${PROXY_URL}/api/movies?${query}`;
-    
-    // --- CÓDIGO DE CORREÇÃO INCLUÍDO AQUI ---
-    // 1. Define o controlador de aborto
+
+    // --- CORREÇÃO: Inicializa AbortController e Timeout ---
     const controller = new AbortController();
-    
-    // 2. Define o timeout (10 segundos)
     const timeoutId = setTimeout(() => {
         controller.abort();
     }, 10000); // Cancela a requisição após 10 segundos
-    // ----------------------------------------
+    // ----------------------------------------------------
 
     try {
         const response = await fetch(url, { signal: controller.signal });
-        
-        // 3. Limpa o timeout (para que ele não seja acionado se a requisição for rápida)
-        clearTimeout(timeoutId); 
+
+        // CORREÇÃO: Limpa o timeout no sucesso
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
+            // Seu backend retornará um JSON de erro
             const errorBody = await response.json();
             throw new Error(`Erro: ${response.status} - ${errorBody.error || 'Falha na requisição.'}`);
         }
@@ -178,8 +178,8 @@ async function fetchProxy(endpoint, params = {}) {
         return await response.json();
 
     } catch (error) {
-        // Assegura que o timeout seja limpo mesmo em caso de erro de rede antes do timeout
-        clearTimeout(timeoutId); 
+        // CORREÇÃO: Limpa o timeout no erro
+        clearTimeout(timeoutId);
 
         if (error.name === 'AbortError') {
             throw new Error('A requisição excedeu o tempo limite.');
@@ -190,28 +190,57 @@ async function fetchProxy(endpoint, params = {}) {
 }
 
 /**
- * Carrega os detalhes do filme, elenco e recomendações.
- * @param {number} movieId - O ID do filme.
+ * Carrega a lista de filmes (popular ou de busca).
+ * @param {string} query - O termo de busca. Se vazio, carrega populares.
  */
-// /frontend/script.js (Função loadMovieDetails atualizada)
+async function loadMovies(query = '') {
+    renderSkeletons();
+
+    let endpoint;
+    let params = {};
+
+    if (query.trim()) {
+        endpoint = '/search/movie';
+        params.query = query;
+        listTitle.textContent = `Resultados da busca por: "${query}"`;
+    } else {
+        endpoint = '/movie/popular';
+        listTitle.textContent = 'Filmes Populares Atuais';
+    }
+
+    try {
+        const data = await fetchProxy(endpoint, params);
+
+        if (data.results && data.results.length > 0) {
+            movieGrid.innerHTML = data.results.map(createMovieCardHTML).join('');
+            hideStatus();
+        } else {
+            showStatus('Nenhum filme encontrado com este termo.');
+        }
+
+    } catch (error) {
+        showStatus(`Falha ao carregar os filmes. ${error.message}`);
+    }
+}
+
 /**
  * Loads detailed information for a movie and renders it into a modal.
  *
  * This asynchronous function performs three parallel API requests (using the
  * project's fetchProxy helper) to fetch:
- *  - movie details     -> endpoint: /movie/{movie_id}
- *  - movie credits     -> endpoint: /movie/{movie_id}/credits
- *  - movie recommendations -> endpoint: /movie/{movie_id}/recommendations
+ * - movie details     -> endpoint: /movie/{movie_id}
+ * - movie credits     -> endpoint: /movie/{movie_id}/credits
+ * - movie recommendations -> endpoint: /movie/{movie_id}/recommendations
  *
  * After all requests resolve, it:
- *  - builds HTML for the modal (including banner, title, synopsis, meta info),
- *    using global constants IMAGE_BASE_URL and BACKDROP_SIZE for image URLs;
- *  - formats genres, release date (locale "pt-BR"), rating, budget and runtime;
- *  - injects HTML produced by helper functions createCastHTML(cast) and
- *    createRecommendationsHTML(recommendations) into the modalBody element;
- *  - adds click listeners to elements with class "recommendation-card" so that
- *    clicking a recommendation will re-open the modal for that recommendation
- *    by calling loadMovieDetails with the recommendation's data-movie-id.
+ * - builds HTML for the modal (including banner, title, synopsis, meta info),
+ * using global constants IMAGE_BASE_URL and BACKDROP_SIZE for image URLs;
+ * - formats genres, release date (locale "pt-BR"), rating, budget and runtime;
+ * - injects HTML produced by helper functions createCastHTML(cast) and
+ * createRecommendationsHTML(recommendations) into the modalBody element;
+ * - adds click listeners to elements with class "recommendation-card" so that
+ * clicking a recommendation will re-open the modal for that recommendation
+ * by calling loadMovieDetails with the recommendation's data-movie-id.
  *
  * The function handles missing data gracefully (e.g. placeholder banner,
  * "N/A" fallbacks) and installs an image onerror fallback in the generated
@@ -220,33 +249,33 @@ async function fetchProxy(endpoint, params = {}) {
  * rendering the error (it does not rethrow).
  *
  * Expected shapes of the API responses (partial):
- *  - movieData: {
- *      id: number|string,
- *      title: string,
- *      overview?: string,
- *      backdrop_path?: string|null,
- *      genres?: Array<{ id: number, name: string }>,
- *      release_date?: string,     // ISO date
- *      vote_average?: number,
- *      runtime?: number,
- *      budget?: number
- *    }
- *  - creditsData: { cast: Array<Object> }
- *  - recommendationsData: { results: Array<{ id: number|string, ... }> }
+ * - movieData: {
+ * id: number|string,
+ * title: string,
+ * overview?: string,
+ * backdrop_path?: string|null,
+ * genres?: Array<{ id: number, name: string }>,
+ * release_date?: string,     // ISO date
+ * vote_average?: number,
+ * runtime?: number,
+ * budget?: number
+ * }
+ * - creditsData: { cast: Array<Object> }
+ * - recommendationsData: { results: Array<{ id: number|string, ... }> }
  *
  * Side effects / globals required:
- *  - fetchProxy(pathTemplate, params) must exist and return parsed JSON.
- *  - IMAGE_BASE_URL, BACKDROP_SIZE constants for image URL composition.
- *  - modalBody is a DOM element whose innerHTML will be replaced.
- *  - createCastHTML(cast) and createRecommendationsHTML(recommendations)
- *    must return HTML strings for injection.
+ * - fetchProxy(pathTemplate, params) must exist and return parsed JSON.
+ * - IMAGE_BASE_URL, BACKDROP_SIZE constants for image URL composition.
+ * - modalBody is a DOM element whose innerHTML will be replaced.
+ * - createCastHTML(cast) and createRecommendationsHTML(recommendations)
+ * must return HTML strings for injection.
  *
  * @async
  * @function loadMovieDetails
  * @param {number|string} movieId - The movie identifier used to fetch details.
  * @returns {Promise<void>} Resolves after the modal is populated (or an error
- *   message is displayed). Errors from the fetch/processing are caught and
- *   rendered into the modal rather than being thrown.
+ * message is displayed). Errors from the fetch/processing are caught and
+ * rendered into the modal rather than being thrown.
  * @example
  * // Open the modal for movie id 550
  * await loadMovieDetails(550);
