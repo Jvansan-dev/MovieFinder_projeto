@@ -1,5 +1,5 @@
 // --- 1. CONFIGURAÇÃO DA API ---
-const PROXY_URL = 'http://localhost:3000'; // MUDAR EM PRODUÇÃO!!!
+const PROXY_URL = window.location.origin; // Usa o domínio atual (https://movieproxy.onrender.com)
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
 const POSTER_SIZE = 'w500';
 const BACKDROP_SIZE = 'w1280';

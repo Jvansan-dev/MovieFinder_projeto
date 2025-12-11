@@ -3,6 +3,7 @@ require('dotenv').config(); // Carrega as variáveis de ambiente
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,14 @@ app.use(cors({
     origin: '*' // Em produção, mude para: 'https://seuusuario.github.io'
 }));
 app.use(express.json());
+
+// 1. Servir arquivos estáticos (CSS, JS, Imagens, etc.) da pasta 'frontend'
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// 2. Definir a rota principal (/) para enviar o index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+});
 
 /**
  * Rota para buscar filmes populares ou por termo de busca.
