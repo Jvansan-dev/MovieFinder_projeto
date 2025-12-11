@@ -163,7 +163,7 @@ async function fetchProxy(endpoint, params = {}) {
 
     try {
         const response = await fetch(url, { signal: controller.signal });
-        
+
         // CORREÇÃO: Limpa o timeout no sucesso
         clearTimeout(timeoutId);
 
@@ -176,7 +176,7 @@ async function fetchProxy(endpoint, params = {}) {
 
     } catch (error) {
         // CORREÇÃO: Limpa o timeout no erro
-        clearTimeout(timeoutId); 
+        clearTimeout(timeoutId);
 
         if (error.name === 'AbortError') {
             throw new Error('A requisição excedeu o tempo limite.');
@@ -312,9 +312,11 @@ movieGrid.addEventListener('click', (e) => {
     }
 });
 
-// Listener para fechar o modal
-closeModalBtn.addEventListener('click', () => {
-    movieModal.style.display = 'none';
+// Listener para fechar o modal com a tecla ESC
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        movieModal.style.display = 'none';
+    }
 });
 
 // Fechar o modal ao clicar fora
@@ -352,9 +354,14 @@ function init() {
 
     // Configura o ícone do botão
     const icon = themeToggle.querySelector('i');
-    icon.classList.toggle('fa-sun', savedTheme === 'light');
-    icon.classList.toggle('fa-moon', savedTheme === 'dark');
-
+    // Garante que o ícone inicial esteja correto (no HTML é fa-sun)
+    if (savedTheme === 'dark') {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+    } else {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    }
 
     // 2. Carrega os filmes populares na inicialização
     loadMovies();
