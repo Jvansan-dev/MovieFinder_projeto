@@ -146,31 +146,28 @@ function createRecommendationsHTML(recommendations) {
  * @returns {Promise<Object>} - O objeto de resposta JSON da API.
  */
 async function fetchProxy(endpoint, params = {}) {
-    // Seu frontend envia os parâmetros para o seu backend
     const query = new URLSearchParams({
-        // Note que NÃO passamos a API_KEY aqui!
-        endpoint: endpoint, // Passamos o endpoint que queremos do TMDB
+        endpoint: endpoint,
         ...params
     }).toString();
 
-    // A URL agora aponta para o seu servidor proxy
     const url = `${PROXY_URL}/api/movies?${query}`;
 
-    // --- CORREÇÃO: Inicializa AbortController e Timeout ---
+    // === CORREÇÃO: DECLARAÇÃO DO ABORTCONTROLLER E TIMEOUT ===
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
         controller.abort();
     }, 10000); // Cancela a requisição após 10 segundos
-    // ----------------------------------------------------
+    // =======================================================
 
     try {
+        // Usa o controller.signal aqui
         const response = await fetch(url, { signal: controller.signal });
 
         // CORREÇÃO: Limpa o timeout no sucesso
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            // Seu backend retornará um JSON de erro
             const errorBody = await response.json();
             throw new Error(`Erro: ${response.status} - ${errorBody.error || 'Falha na requisição.'}`);
         }
@@ -397,13 +394,11 @@ themeToggle.addEventListener('click', () => {
 
 
 // --- 6. INICIALIZAÇÃO ---
+// ...
 
-/**
- * Função de inicialização do site.
- */
 function init() {
-    // 1. Carrega o tema do localStorage ou usa o padrão 'light'
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    // 1. Carrega o tema do localStorage ou usa o padrão 'dark' (para o estilo futurista)
+    const savedTheme = localStorage.getItem('theme') || 'dark'; // <--- ALTERADO DE 'light' para 'dark'
     document.documentElement.setAttribute('data-theme', savedTheme);
 
     // Configura o ícone do botão
