@@ -402,8 +402,8 @@ themeToggle.addEventListener('click', () => {
  * Função de inicialização do site.
  */
 function init() {
-    // 1. Carrega o tema do localStorage ou usa o padrão 'light'
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    // 1. Carrega o tema do localStorage ou usa o padrão 'dark'
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
     // Configura o ícone do botão

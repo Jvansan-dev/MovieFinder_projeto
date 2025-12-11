@@ -13,14 +13,21 @@
 
 [data-theme="dark"] {
     /* Variáveis do Modo Escuro */
-    --background-color: #1a202c;
-    --card-background: #2d3748;
-    --text-color: #f8f8f8;
-    --header-background: #2a69ac;
+    --background-color: #121218;
+    /* Fundo mais escuro */
+    --card-background: #1e1e24;
+    /* Fundo de card mais escuro */
+    --text-color: #e0e0e0;
+    --header-background: #000000;
+    /* Header preto */
     --header-text: #ffffff;
-    --accent-color: #fbd38d;
-    --border-color: #4a5568;
-    --shadow-color: rgba(0, 0, 0, 0.4);
+    --accent-color: #00f0ff;
+    /* NEON AZUL-ELÉTRICO */
+    --border-color: #3f444c;
+    --shadow-color: rgba(0, 240, 255, 0.2);
+    /* Sombra neon azul */
+    --neon-glow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
+    /* Efeito brilho */
 }
 
 * {
@@ -34,7 +41,8 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     transition: background-color 0.3s, color 0.3s;
-    padding-top: 80px; /* Espaço para o header fixo */
+    padding-top: 80px;
+    /* Espaço para o header fixo */
 }
 
 .container {
@@ -120,7 +128,8 @@ body {
 /* --- 3. LISTAGEM E GRID DE FILMES (RESPONSIVO) --- */
 .movie-list-container {
     padding-top: 30px;
-    min-height: calc(100vh - 80px); /* Garante que o main ocupe a altura mínima */
+    min-height: calc(100vh - 80px);
+    /* Garante que o main ocupe a altura mínima */
 }
 
 #listTitle {
@@ -144,24 +153,34 @@ body {
 /* --- 4. CARD DE FILME --- */
 .movie-card {
     background-color: var(--card-background);
-    border-radius: 10px;
+    border-radius: 8px;
+    /* Cantos ligeiramente mais nítidos */
     overflow: hidden;
-    box-shadow: 0 4px 10px var(--shadow-color);
+    box-shadow: 0 4px 8px var(--shadow-color);
     cursor: pointer;
     position: relative;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
+    /* Adiciona transição para a borda */
+    border: 1px solid transparent;
+    /* Adicionado para transição do hover */
 }
 
 .movie-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px var(--shadow-color);
+    /* Usa o brilho neon para o efeito hover */
+    box-shadow: var(--neon-glow), 0 8px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--accent-color);
+    /* Borda destacada no hover */
 }
+
+/* ... (Mantenha o resto do .movie-card) ... */
 
 .movie-poster {
     width: 100%;
     height: auto;
     display: block;
-    aspect-ratio: 2 / 3; /* Proporção de pôster de filme */
+    aspect-ratio: 2 / 3;
+    /* Proporção de pôster de filme */
     object-fit: cover;
 }
 
@@ -173,7 +192,8 @@ body {
     font-size: 1.1rem;
     font-weight: bold;
     margin-bottom: 5px;
-    height: 2.8em; /* 2 linhas */
+    height: 2.8em;
+    /* 2 linhas */
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -199,7 +219,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
+    /* Fundo mais escuro para maior contraste */
+    background-color: rgba(0, 0, 0, 0.95);
     color: white;
     padding: 15px;
     opacity: 0;
@@ -209,6 +230,10 @@ body {
     flex-direction: column;
     justify-content: center;
     text-align: center;
+    /* Adicione uma leve borda neon */
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    /* Combina com o card */
 }
 
 .movie-card:hover .card-overlay {
@@ -217,17 +242,24 @@ body {
 }
 
 .overlay-title {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+    /* Maior destaque */
     margin-bottom: 10px;
+    color: var(--accent-color);
+    /* Título na cor neon */
+    text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+    /* Sombra suave */
 }
 
 .overlay-overview {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    /* Um pouco maior */
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 8;
-    line-clamp: 8;
+    -webkit-line-clamp: 12;
+    /* Aumenta para 12 linhas */
+    line-clamp: 12;
     -webkit-box-orient: vertical;
 }
 
@@ -239,7 +271,8 @@ body {
 }
 
 .skeleton-card {
-    height: 380px; /* Altura aproximada do card de filme */
+    height: 380px;
+    /* Altura aproximada do card de filme */
     position: relative;
 }
 
@@ -264,9 +297,11 @@ body {
     0% {
         opacity: 0.6;
     }
+
     50% {
         opacity: 1;
     }
+
     100% {
         opacity: 0.6;
     }
@@ -274,7 +309,8 @@ body {
 
 /* --- 6. MODAL DE DETALHES --- */
 .modal {
-    display: none; /* Escondido por padrão */
+    display: none;
+    /* Escondido por padrão */
     position: fixed;
     z-index: 2000;
     left: 0;
@@ -289,7 +325,8 @@ body {
 
 .modal-content {
     background-color: var(--card-background);
-    margin: 5% auto; /* 5% do topo e centrado */
+    margin: 5% auto;
+    /* 5% do topo e centrado */
     padding: 20px;
     border-radius: 15px;
     width: 90%;
@@ -359,7 +396,8 @@ body {
     font-size: 1.1rem;
 }
 
-.cast-list, .recommendations-grid {
+.cast-list,
+.recommendations-grid {
     display: flex;
     overflow-x: auto;
     gap: 15px;
@@ -369,7 +407,8 @@ body {
 
 .cast-member {
     text-align: center;
-    flex: 0 0 100px; /* Largura fixa para os cards de ator */
+    flex: 0 0 100px;
+    /* Largura fixa para os cards de ator */
 }
 
 .cast-photo {
@@ -384,7 +423,8 @@ body {
 .recommendation-card {
     text-align: center;
     cursor: pointer;
-    flex: 0 0 150px; /* Largura fixa para recomendações */
+    flex: 0 0 150px;
+    /* Largura fixa para recomendações */
 }
 
 .recommendation-poster {
@@ -399,7 +439,8 @@ body {
 .recommendation-card p {
     white-space: normal;
     font-size: 0.9rem;
-    height: 2.5em; /* Garante altura para 2 linhas de título */
+    height: 2.5em;
+    /* Garante altura para 2 linhas de título */
     overflow: hidden;
 }
 
@@ -415,7 +456,8 @@ body {
 /* --- 8. MEDIA QUERIES (Responsividade) --- */
 @media (min-width: 768px) {
     .modal-details-grid {
-        grid-template-columns: 2fr 1fr; /* Sinopse + Detalhes */
+        grid-template-columns: 2fr 1fr;
+        /* Sinopse + Detalhes */
     }
 }
 
@@ -424,15 +466,19 @@ body {
         flex-direction: column;
         padding: 10px 20px;
     }
+
     .logo {
         margin-bottom: 10px;
     }
+
     .search-area {
         width: 100%;
         margin: 0 0 10px 0;
     }
+
     body {
-        padding-top: 120px; /* Ajusta o padding para o header empilhado */
+        padding-top: 120px;
+        /* Ajusta o padding para o header empilhado */
     }
 }
 
@@ -441,6 +487,7 @@ body {
         /* Em telas muito pequenas, use 2 colunas */
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
+
     .modal-movie-title {
         font-size: 1.8rem;
     }
