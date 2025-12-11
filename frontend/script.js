@@ -141,6 +141,7 @@ function createRecommendationsHTML(recommendations) {
 
 /**
  * Função genérica para fazer requisições à API do TMDB.
+ * (CORRIGIDO: Incluída declaração do AbortController e Timeout)
  * @param {string} endpoint - O endpoint da API (ex: '/movie/popular').
  * @param {Object} params - Parâmetros de query adicionais.
  * @returns {Promise<Object>} - O objeto de resposta JSON da API.
@@ -161,9 +162,8 @@ async function fetchProxy(endpoint, params = {}) {
     // =======================================================
 
     try {
-        // Usa o controller.signal aqui
         const response = await fetch(url, { signal: controller.signal });
-
+        
         // CORREÇÃO: Limpa o timeout no sucesso
         clearTimeout(timeoutId);
 
@@ -176,7 +176,7 @@ async function fetchProxy(endpoint, params = {}) {
 
     } catch (error) {
         // CORREÇÃO: Limpa o timeout no erro
-        clearTimeout(timeoutId);
+        clearTimeout(timeoutId); 
 
         if (error.name === 'AbortError') {
             throw new Error('A requisição excedeu o tempo limite.');
@@ -221,72 +221,19 @@ async function loadMovies(query = '') {
 }
 
 /**
- * Loads detailed information for a movie and renders it into a modal.
- *
- * This asynchronous function performs three parallel API requests (using the
- * project's fetchProxy helper) to fetch:
- * - movie details     -> endpoint: /movie/{movie_id}
- * - movie credits     -> endpoint: /movie/{movie_id}/credits
- * - movie recommendations -> endpoint: /movie/{movie_id}/recommendations
- *
- * After all requests resolve, it:
- * - builds HTML for the modal (including banner, title, synopsis, meta info),
- * using global constants IMAGE_BASE_URL and BACKDROP_SIZE for image URLs;
- * - formats genres, release date (locale "pt-BR"), rating, budget and runtime;
- * - injects HTML produced by helper functions createCastHTML(cast) and
- * createRecommendationsHTML(recommendations) into the modalBody element;
- * - adds click listeners to elements with class "recommendation-card" so that
- * clicking a recommendation will re-open the modal for that recommendation
- * by calling loadMovieDetails with the recommendation's data-movie-id.
- *
- * The function handles missing data gracefully (e.g. placeholder banner,
- * "N/A" fallbacks) and installs an image onerror fallback in the generated
- * markup. Network or parsing errors are caught and a user-friendly error
- * message is rendered inside the modal; the function itself resolves after
- * rendering the error (it does not rethrow).
- *
- * Expected shapes of the API responses (partial):
- * - movieData: {
- * id: number|string,
- * title: string,
- * overview?: string,
- * backdrop_path?: string|null,
- * genres?: Array<{ id: number, name: string }>,
- * release_date?: string,     // ISO date
- * vote_average?: number,
- * runtime?: number,
- * budget?: number
- * }
- * - creditsData: { cast: Array<Object> }
- * - recommendationsData: { results: Array<{ id: number|string, ... }> }
- *
- * Side effects / globals required:
- * - fetchProxy(pathTemplate, params) must exist and return parsed JSON.
- * - IMAGE_BASE_URL, BACKDROP_SIZE constants for image URL composition.
- * - modalBody is a DOM element whose innerHTML will be replaced.
- * - createCastHTML(cast) and createRecommendationsHTML(recommendations)
- * must return HTML strings for injection.
- *
- * @async
- * @function loadMovieDetails
- * @param {number|string} movieId - The movie identifier used to fetch details.
- * @returns {Promise<void>} Resolves after the modal is populated (or an error
- * message is displayed). Errors from the fetch/processing are caught and
- * rendered into the modal rather than being thrown.
- * @example
- * // Open the modal for movie id 550
- * await loadMovieDetails(550);
+ * Carrega os detalhes do filme, elenco e recomendações.
+ * @param {number} movieId - O ID do filme.
  */
 async function loadMovieDetails(movieId) {
-    // ... (resto do código) ...
+    movieModal.style.display = 'block';
+
     try {
-        // Requisições em paralelo (o endpoint é o caminho que o backend irá buscar)
+        // Requisições em paralelo
         const [movieData, creditsData, recommendationsData] = await Promise.all([
-            fetchProxy('/movie/{movie_id}', { movie_id: movieId }), // Busca Detalhes
-            fetchProxy('/movie/{movie_id}/credits', { movie_id: movieId }), // Busca Créditos
-            fetchProxy('/movie/{movie_id}/recommendations', { movie_id: movieId }) // Busca Recomendações
+            fetchProxy('/movie/{movie_id}', { movie_id: movieId }),
+            fetchProxy('/movie/{movie_id}/credits', { movie_id: movieId }),
+            fetchProxy('/movie/{movie_id}/recommendations', { movie_id: movieId })
         ]);
-        // ... (resto do código) ...
 
         const movie = movieData;
         const cast = creditsData.cast;
@@ -394,11 +341,13 @@ themeToggle.addEventListener('click', () => {
 
 
 // --- 6. INICIALIZAÇÃO ---
-// ...
 
+/**
+ * Função de inicialização do site.
+ */
 function init() {
     // 1. Carrega o tema do localStorage ou usa o padrão 'dark' (para o estilo futurista)
-    const savedTheme = localStorage.getItem('theme') || 'dark'; // <--- ALTERADO DE 'light' para 'dark'
+    const savedTheme = localStorage.getItem('theme') || 'dark'; // Padrão 'dark' para o visual futurista
     document.documentElement.setAttribute('data-theme', savedTheme);
 
     // Configura o ícone do botão
