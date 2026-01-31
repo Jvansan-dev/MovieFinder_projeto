@@ -532,4 +532,87 @@ body {
       object-fit: cover;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
    }
+
+   /* --- HEADER CONTROLS (Agrupa Switch e Tema) --- */
+   .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      /* Espaço entre o seletor de filme e o botão de tema */
+   }
+
+   /* --- TECH SWITCH (O container do botão) --- */
+   .tech-switch-container {
+      position: relative;
+      display: flex;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 30px;
+      padding: 4px;
+      overflow: hidden;
+   }
+
+   /* Esconde as bolinhas originais dos radio buttons */
+   .tech-switch-container input[type="radio"] {
+      display: none;
+   }
+
+   /* Estilo dos Labels (Texto "Filmes" / "Séries") */
+   .tech-label {
+      position: relative;
+      z-index: 2;
+      /* Fica acima do highlight */
+      padding: 8px 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--header-text);
+      cursor: pointer;
+      transition: color 0.3s ease;
+      user-select: none;
+   }
+
+   /* Efeito Hover nos textos */
+   .tech-label:hover {
+      color: var(--accent-color);
+   }
+
+   /* --- HIGHLIGHT ANIMADO (O fundo que se move) --- */
+   .tech-highlight {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      height: calc(100% - 8px);
+      width: 50%;
+      /* Ocupa metade do container */
+      background-color: var(--accent-color);
+      border-radius: 25px;
+      z-index: 1;
+      transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+      box-shadow: 0 0 10px var(--accent-color);
+      /* Brilho Neon */
+      opacity: 0.8;
+   }
+
+   /* Mágica da Animação: Move o highlight baseada na escolha */
+   /* Se o segundo input (Séries) estiver checado, move o highlight para a direita */
+   #typeTv:checked~.tech-highlight {
+      transform: translateX(100%);
+      /* Move 100% para o lado */
+   }
+
+   /* Muda a cor do texto selecionado para preto (para contraste com o neon) ou branco */
+   input:checked+.tech-label {
+      color: #000;
+      /* Texto escuro dentro do brilho */
+      text-shadow: none;
+   }
+
+   /* Ajustes Responsivos para o Header */
+   @media (max-width: 768px) {
+      .header-controls {
+         margin-top: 10px;
+         width: 100%;
+         justify-content: center;
+      }
+   }
 }

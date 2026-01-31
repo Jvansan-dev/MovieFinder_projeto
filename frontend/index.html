@@ -4,7 +4,7 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>🎬 MovieFinder | Busca de Filmes TMDB</title>
+   <title>MovieFinder | Busca de Filmes</title>
    <link rel="stylesheet" href="style.css">
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -14,21 +14,29 @@
    <header class="header-fixed">
       <div class="container header-content">
          <h1 class="logo">MovieFinder</h1>
-         <div class="search-area">
-            <select id="searchType" class="search-type-select">
-               <option value="movie">Filmes</option>
-               <option value="tv">Séries</option>
-            </select>
 
-            <input type="text" id="searchInput" placeholder="Pesquisar...">
+         <div class="search-area">
+            <input type="text" id="searchInput" placeholder="Buscar filmes ou séries...">
             <i class="fas fa-search search-icon"></i>
          </div>
-         <button id="themeToggle" class="theme-toggle" aria-label="Alternar modo claro e escuro">
-            <i class="fas fa-sun"></i>
-         </button>
+
+         <div class="header-controls">
+            <div class="tech-switch-container">
+               <input type="radio" name="searchType" id="typeMovie" value="movie" checked>
+               <label for="typeMovie" class="tech-label">Filmes</label>
+
+               <input type="radio" name="searchType" id="typeTv" value="tv">
+               <label for="typeTv" class="tech-label">Séries</label>
+
+               <div class="tech-highlight"></div>
+            </div>
+
+            <button id="themeToggle" class="theme-toggle" aria-label="Alternar modo">
+               <i class="fas fa-sun"></i>
+            </button>
+         </div>
       </div>
    </header>
-
    <main class="container movie-list-container">
       <h2 id="listTitle">Filmes Populares Atuais</h2>
       <div class="movie-grid" id="movieGrid">

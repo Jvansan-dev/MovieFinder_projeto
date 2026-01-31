@@ -326,14 +326,23 @@ searchInput.addEventListener('input', (e) => {
    }, 500);
 });
 
-// NOVO: Listener para troca de Tipo (Filme <-> Série)
-if (searchType) {
-   searchType.addEventListener('change', (e) => {
-      currentType = e.target.value; // 'movie' ou 'tv'
+// Seleciona todos os inputs de rádio com o nome 'searchType'
+const typeRadios = document.querySelectorAll('input[name="searchType"]');
+
+// Adiciona o evento de clique em cada um
+typeRadios.forEach(radio => {
+   radio.addEventListener('change', (e) => {
+      // Atualiza a variável global currentType
+      currentType = e.target.value;
+
+      // Faz a busca novamente com o novo tipo
       const query = searchInput.value.trim();
-      loadItems(query); // Recarrega com o novo tipo
+      loadItems(query);
+
+      // (Opcional) Feedback visual ou log
+      console.log(`Tipo alterado para: ${currentType}`);
    });
-}
+});
 
 // Listener para abrir o modal
 movieGrid.addEventListener('click', (e) => {
